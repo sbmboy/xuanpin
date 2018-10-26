@@ -232,6 +232,7 @@ ul.top-menu > li > .logout {
     height: 100%;
     position: fixed;
     background: #424a5d;
+    z-index: 2;
 }
 
 #sidebar h5 {
@@ -397,6 +398,7 @@ ul.sidebar-menu li a.active i {
 /* MAIN CONTENT CONFIGURATION */
 #main-content {
     margin-left: 210px;
+    margin-bottom: 40px;
 }
 
 .header, .footer {
@@ -1268,8 +1270,40 @@ PANELS CONFIGURATIONS
 	color: white;
 	font-weight: 900;
 }
-
-
+/*Show Panel*/
+.show-panel{
+    
+}
+.show-panel .user{
+    padding-top: 20px;
+}
+.show-panel .show-panel-image{
+    margin-top: -15px;
+    background-attachment: relative;
+    background-position: center center;
+    min-height: 220px;
+    width: 100%;
+}
+.show-panel h4{
+    color:#fff;
+    text-align: center;
+    font-weight:bold;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+.show-panel p{
+    text-align: center;
+    color:#fff;
+}
+.show-panel .tabbar{
+    padding:0 15px;
+}
+.show-panel .tabbar .left{
+    text-align: left;
+}
+.show-panel .tabbar .right{
+    float: right;
+}
 /* Instagram Panel*/
 .instagram-panel {
 	background: url(../img/instagram.jpg) no-repeat center top;
@@ -2218,6 +2252,9 @@ label {
     background: #68dff0;
     color: #fff;
     padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
 
 
