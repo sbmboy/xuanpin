@@ -3,7 +3,7 @@
         <!-- sidebar menu start-->
         <ul class="sidebar-menu" id="nav-accordion">
 
-            <p class="centered"><a href="./profile.php"><img src="<?='http://www.gravatar.com/avatar/'.md5($_SESSION['loginStatus']['email']).'';?>"
+            <p class="centered"><a data-toggle="modal" href="#myPassword" title="修改密码"><img src="<?='http://www.gravatar.com/avatar/'.md5($_SESSION['loginStatus']['email']).'';?>"
                         class="img-circle" width="60"></a></p>
             <h5 class="centered">
                 <?=$_SESSION['loginStatus']['nickname']?>

@@ -29,64 +29,80 @@ if(isset($_POST['install'])){
 	$db->exec("begin exclusive transaction");
 	// 创建user表
     $db->exec("CREATE TABLE \"hlong_user\" (
-  		\"username\" varchar(255),  /*用户名*/
-  		\"nickname\" varchar(255),  /*昵称*/
-  		\"passwd\" varchar(255),    /*密码*/
-  		\"email\" varchar(255),     /*邮箱*/
-  		\"lastlogin\" INTEGER, /*最后登录时间*/
-  		\"auth\" varchar(255),      /*权限*/
-  		\"group\" varchar(255),     /*所属组*/
-  		\"status\" INTEGER,    /*状态*/
-  		\"remark\" TEXT)       /*备注信息*/
+  		\"user_nicename\" varchar(255),  /*昵称*/
+  		\"user_username\" varchar(255),  /*用户名*/
+  		\"user_password\" varchar(255),  /*密码*/
+  		\"user_email\" varchar(255),     /*邮箱*/
+  		\"user_logintime\" INTEGER,      /*最后登录时间*/
+  		\"user_group\" varchar(255),     /*权限*/
+  		\"user_auth\" varchar(255),      /*所属组*/
+  		\"user_status\" varchar(255),    /*状态*/
+  		\"user_remark\" TEXT)            /*备注信息*/
 	");
-    $db->exec("CREATE UNIQUE INDEX user_username on hlong_user (username)");
+    $db->exec("CREATE UNIQUE INDEX user_username on hlong_user (user_username)");
+    $db->exec("CREATE INDEX user_logintime on hlong_user (user_logintime DESC)");
     $passwd=md5($passwd.$siteTitle);
     $username=$db->escapeString($username);
     $nickname=$db->escapeString($nickname);
     $passwd=$db->escapeString($passwd);
     $email=$db->escapeString($email);
 	// 写入超级管理员
-    $sql="insert into hlong_user values ('{$username}','{$nickname}','{$passwd}','{$email}',NULL,9,NULL,1,'超级管理员')";
+    $sql="INSERT INTO hlong_user (\"user_nicename\", \"user_username\", \"user_password\", \"user_email\", \"user_logintime\", \"user_group\", \"user_auth\", \"user_status\", \"user_remark\") 
+    VALUES ('{$nickname}','{$username}','{$passwd}','{$email}',NULL,NULL,9,'enable','超级管理员')";
     $db->exec($sql);
     // 创建分类管理表
     $db->exec("CREATE TABLE \"hlong_category\" (
-  		\"categoryname\" varchar,   /*名称*/
-        \"slug\" varchar,   /*简称*/
-        \"father\" varchar, /*父级*/
-  		\"dircounts\" INTEGER,  /*分类数*/
-  		\"filecounts\" INTEGER,  /*文件数*/
-        \"remark\" TEXT)    /*备注*/
-		");
-    $db->exec("CREATE UNIQUE INDEX category_categoryname on hlong_category (categoryname)");
-    $db->exec("CREATE INDEX category_father on hlong_category (father)");
-    $db->exec("CREATE INDEX category_slug on hlong_category (slug)");
+  		\"category_name\" varchar,             /*名称*/
+        \"category_desc\" TEXT,                /*简介*/
+        \"category_path\" varchar,             /*保存路径*/
+        \"category_father_id\" varchar,        /*父级id*/
+  		\"category_child_counts\" INTEGER,     /*子分类数*/
+  		\"category_products_counts\" INTEGER)   /*文件数*/
+    ");
+    $db->exec("CREATE UNIQUE INDEX category_category_name on hlong_category (category_name)");
+    $db->exec("CREATE INDEX category_father_id on hlong_category (category_father_id)");
     // 创建资源信息表
     $db->exec("CREATE TABLE \"hlong_products\" (
-        \"title\" varchar,
-        \"tag\" varchar,
-        \"desc\" varchar,
-        \"category\" varchar,
-        \"addtime\" varchar,
-        \"user\" varchar,
-        \"filesize\" varchar,
-        \"filecounts\" INTEGER,
-        \"filepath\" varchar,
-        \"downloadtimes\" INTEGER
-    )"); 
-    $db->exec("CREATE UNIQUE INDEX products_title on hlong_products (title)");
-    $db->exec("CREATE INDEX products_category on hlong_products (category)");
-    $db->exec("CREATE INDEX products_addtime on hlong_products (addtime)");
-    $db->exec("CREATE INDEX products_filecounts on hlong_products (filecounts)");
-    $db->exec("CREATE INDEX products_downloadtimes on hlong_products (downloadtimes)");
+        \"product_category_id\" INTEGER,   /*分类id*/
+        \"product_title\" varchar,         /*产品名*/
+        \"product_path\" varchar,          /*产路径*/
+        \"product_tag\" varchar,           /*产品tag*/
+        \"product_desc\" varchar,          /*产品描述*/
+        \"product_posttime\" varchar,      /*创建时间*/
+        \"product_user\" varchar,          /*创建者*/
+        \"product_image_counts\" INTEGER,  /*图片数量*/
+        \"product_video_counts\" INTEGER,  /*视频数量*/
+        \"product_other_counts\" INTEGER,  /*其他文件*/
+        \"product_downloadtimes\" INTEGER) /*下载次数*/
+    "); 
+    $db->exec("CREATE UNIQUE INDEX products_product_path on hlong_products (product_path)");
+    $db->exec("CREATE INDEX products_product_category_id on hlong_products (product_category_id)");
+    $db->exec("CREATE INDEX products_product_posttime on hlong_products (product_posttime DESC)");
+    $db->exec("CREATE INDEX products_product_user on hlong_products (product_user)");
+    $db->exec("CREATE INDEX products_product_downloadtimes on hlong_products (product_downloadtimes)");
 
     // 创建tag表
-    $db->exec("CREATE TABLE \"hlong_tag\" (
-        \"tag\" varchar,  
-        \"ids\" TEXT,       
-        \"count\" INTEGER)
+    $db->exec("CREATE TABLE \"hlong_tags\" (
+        \"tag_title\" varchar,    /*tag*/
+        \"tag_product_ids\" TEXT, /*products ids*/      
+        \"tag_counts\" INTEGER)   /*counts*/
     ");
-    $db->exec("CREATE UNIQUE INDEX tag_tag on hlong_tag (tag)");
-    $db->exec("CREATE INDEX tag_count on hlong_tag (count)");
+    $db->exec("CREATE UNIQUE INDEX tags_tag_title on hlong_tags (tag_title)");
+    $db->exec("CREATE INDEX tags_tag_counts on hlong_tags (tag_counts DESC)");
+
+    // 创建filesinfo表
+    $db->exec("CREATE TABLE \"hlong_filesinfo\" (
+        \"file_product_id\" INTEGER,    /*product id*/
+        \"file_title\" varchar,         /*文件名*/
+        \"file_path\" varchar,          /*文件路径*/
+        \"file_size\" INTEGER,          /*文件大小*/
+        \"file_type\" varchar,          /*文件类型*/
+        \"file_posttime\" INTEGER,      /*添加时间*/
+        \"file_author\" varchar,          /*文件作者*/
+        \"file_downloadtimes\" INTEGER) /*下载次数*/
+    ");
+    $db->exec("CREATE UNIQUE INDEX filesinfo_file_path on hlong_filesinfo (file_path)");
+    $db->exec("CREATE INDEX filesinfo_file_product_id on hlong_filesinfo (file_product_id DESC)");
 
     // 关闭数据库
 	$db->exec("end transaction");
@@ -103,29 +119,27 @@ if(isset($_POST['install'])){
 if(isset($_POST['login'])){
     if(!empty($_POST['username'])&&!empty($_POST['passwd'])){
 		$db=new SQLite3("DATA/{$dbname}",SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
-		$sql="SELECT rowid,* FROM `hlong_user` WHERE username = '{$_POST['username']}' AND passwd = '".md5($_POST['passwd'].$siteTitle)."'";
+		$sql="SELECT rowid,* FROM `hlong_user` WHERE user_username = '{$_POST['username']}' AND user_password = '".md5($_POST['passwd'].$siteTitle)."'";
 		$result=$db->query($sql);
 		$row=$result->fetchArray(SQLITE3_ASSOC);
 		if($row){
-			if($row['group']=='Disabled'){
+			if($row['user_status']=='disable'){
                 $result->finalize();
                 unset($result);
                 $db->close();
                 header("Content-type:text/html;charset=utf-8");
-                echo '<script type="text/javascript">alert("对不起 '.$row['username'].'，你的账户已经被禁用，请联系管理员。");window.location.href="/login.php";</script>';
+                echo '<script type="text/javascript">alert("对不起 '.$row['user_username'].'，你的账户已经被禁用，请联系管理员。");window.location.href="/login.php";</script>';
                 exit;
             }else{
                 $_SESSION['loginStatus']=array(
-                'username' => $row['username'],
-                'email' => $row['email'],
-                'nickname' => $row['nickname'],
-                'auth' => $row['auth'],
-                'tables' => $row['tables'],
-                'sidebar' => $row['sidebar'],
+                    'username' => $row['user_username'],
+                    'email' => $row['user_email'],
+                    'nickname' => $row['user_nicename'],
+                    'auth' => $row['user_auth'],
                     'status' =>true,
                     'loginTime' => time(),
                 );
-                $sql="UPDATE \"hlong_user\" SET \"lastlogin\" = '".time()."' WHERE \"username\" = '{$row['username']}'";
+                $sql="UPDATE \"hlong_user\" SET \"user_logintime\" = '".time()."' WHERE \"user_username\" = '{$row['user_username']}'";
                 $db->exec($sql) or print($sql);
                 $result->finalize();
                 $db->close();

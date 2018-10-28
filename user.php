@@ -4,7 +4,7 @@ if(isset($_GET['id'])&&$_GET['id']>0){
     switch ($_GET['action']) {
         case 'pwd':
             $db = new SQLite3("DATA/{$dbname}",SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
-            $sql="UPDATE hlong_user SET passwd = '".md5('123456'.$siteTitle)."' WHERE rowid = ".intval($_GET['id']);
+            $sql="UPDATE hlong_user SET user_password = '".md5('123456'.$siteTitle)."' WHERE rowid = ".intval($_GET['id']);
             $result = $db->exec($sql);
             $db->close();
             if($result){
@@ -17,6 +17,30 @@ if(isset($_GET['id'])&&$_GET['id']>0){
         case 'del':
             $db = new SQLite3("DATA/{$dbname}",SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
             $sql="DELETE FROM hlong_user WHERE rowid = ".intval($_GET['id']);
+            $result = $db->exec($sql);
+            $db->close();
+            if($result){
+                echo '<script>alert("成功");</script>';
+            }else{
+                echo '<script>alert("失败");</script>';
+            }
+            break;
+
+        case 'stop':
+            $db = new SQLite3("DATA/{$dbname}",SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
+            $sql="UPDATE hlong_user SET user_status = 'disable' WHERE rowid = ".intval($_GET['id']);
+            $result = $db->exec($sql);
+            $db->close();
+            if($result){
+                echo '<script>alert("成功");</script>';
+            }else{
+                echo '<script>alert("失败");</script>';
+            }
+            break;
+        
+        case 'pass':
+            $db = new SQLite3("DATA/{$dbname}",SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
+            $sql="UPDATE hlong_user SET user_status = 'enable' WHERE rowid = ".intval($_GET['id']);
             $result = $db->exec($sql);
             $db->close();
             if($result){
@@ -111,10 +135,17 @@ if(isset($_GET['id'])&&$_GET['id']>0){
                                                 <i class=" fa fa-user"></i>
                                             </div>
                                             <div class="task-title">
-                                                <span class="task-title-sp"><?=$user['nickname']?></span>
-                                                <?=$user['lastlogin']?'<span class="badge bg-success">'.format_date($user['lastlogin']).'</span>':'<span class="badge bg-warning">未登录</span>'?>
+                                                <span class="task-title-sp"><?=$user['user_nicename']?></span>
+                                                <?=$user['user_logintime']?'<span class="badge bg-success">'.format_date($user['user_logintime']).'</span>':'<span class="badge bg-warning">未登录</span>'?>
+
+<?php if($user['user_status']=='enable'): ?><span class="badge bg-theme">账户已启用</span><?php endif; ?>
+<?php if($user['user_status']=='disable'): ?><span class="badge bg-important">账户已禁用</span><?php endif; ?>
+
+
                                                 <div class="pull-right hidden-phone">
                                                     <a href="?id=<?=$user['rowid']?>&action=pwd" class="btn btn-primary btn-xs" title="重置密码为：123456"><i class="fa fa-pencil"></i></a>
+                                                    <?php if($user['user_status']=='enable'): ?><a href="?id=<?=$user['rowid']?>&action=stop" class="btn btn-warning btn-xs" title="禁止登录"><i class="fa fa-ban"></i></a><?php endif; ?>
+                                                    <?php if($user['user_status']=='disable'): ?><a href="?id=<?=$user['rowid']?>&action=pass" class="btn btn-success btn-xs" title="恢复登录"><i class="fa fa-check-circle"></i></a><?php endif; ?>
                                                     <a href="?id=<?=$user['rowid']?>&action=del" class="btn btn-danger btn-xs" title="删除用户"><i class="fa fa-trash-o "></i></a>
                                                 </div>
                                             </div>
@@ -155,7 +186,7 @@ if(isset($_GET['id'])&&$_GET['id']>0){
     <script src="assets/js/jquery.scrollTo.min.js"></script>
     <script src="assets/js/jquery.nicescroll.js" type="text/javascript"></script>
 
-
+<?php include 'footer.php';?>
 </body>
 
 </html>

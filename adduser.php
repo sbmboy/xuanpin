@@ -6,7 +6,9 @@ require_once 'config.php';
 if(isset($_POST['username'])){
     if(!empty($_POST['username'])&&!empty($_POST['password'])){
         $db = new SQLite3("DATA/{$dbname}",SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
-        $sql="INSERT INTO hlong_user (\"username\", \"nickname\",\"passwd\",\"email\",\"lastlogin\",\"auth\",\"group\",\"status\",\"remark\") VALUES ('".$db->escapeString($_POST['username'])."','".$db->escapeString($_POST['nickname'])."','".$db->escapeString(md5($_POST['password'].$siteTitle))."','".$db->escapeString($_POST['email'])."',Null,'".$db->escapeString($_POST['auth'])."',Null,1,'".$db->escapeString($_POST['remark'])."')";
+
+        $sql="INSERT INTO hlong_user (\"user_nicename\", \"user_username\", \"user_password\", \"user_email\", \"user_logintime\", \"user_group\", \"user_auth\", \"user_status\", \"user_remark\") 
+        VALUES ('".$db->escapeString($_POST['nickname'])."','".$db->escapeString($_POST['username'])."','".$db->escapeString(md5($_POST['password'].$siteTitle))."','".$db->escapeString($_POST['email'])."',Null,Null,'".$db->escapeString($_POST['auth'])."','enable','".$db->escapeString($_POST['remark'])."')";
         $result = $db->exec($sql);
         $db->close();
         if($result){
@@ -154,6 +156,6 @@ if(isset($_POST['username'])){
     <!--common script for all pages-->
     <script src="assets/js/common-scripts.js"></script>
 
-
+<?php include 'footer.php';?>
   </body>
 </html>

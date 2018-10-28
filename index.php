@@ -508,6 +508,6 @@ require_once 'config.php';
         }
     </script>
   
-
+  <?php include 'footer.php';?>
   </body>
 </html>

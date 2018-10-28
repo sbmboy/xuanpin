@@ -11,6 +11,8 @@ if(isset($_GET['cateid'])&&$_GET['cateid']>0){
             $db = new SQLite3("DATA/{$dbname}",SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
             $sql="DELETE FROM hlong_category WHERE rowid = ".intval($_GET['cateid']);
             $result = $db->exec($sql);
+            $sql="UPDATE hlong_category SET category_child_counts = category_child_counts-1 WHERE rowid =".intval($_GET['id']);
+            $db->exec($sql);
             $db->close();
             if($result){
                 echo '<script>alert("成功");</script>';
@@ -23,19 +25,24 @@ if(isset($_GET['cateid'])&&$_GET['cateid']>0){
             break;
     }
 }
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title><?=$siteSubtitle?>|<?=$siteTitle?></title>
+    <title>
+        <?=$siteSubtitle?>|
+        <?=$siteTitle?>
+    </title>
 
     <!-- Bootstrap core CSS -->
     <link href="assets/css/bootstrap.css" rel="stylesheet">
     <!--external css-->
     <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet" />
-    
+
     <!-- Custom styles for this template -->
     <link href="assets/css/style.css" rel="stylesheet">
     <link href="assets/css/style-responsive.css" rel="stylesheet">
@@ -46,88 +53,108 @@ if(isset($_GET['cateid'])&&$_GET['cateid']>0){
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
+</head>
 
-  <body>
+<body>
 
-  <section id="container" >
-      <!-- **********************************************************************************************************************************************************
+    <section id="container">
+        <!-- **********************************************************************************************************************************************************
       TOP BAR CONTENT & NOTIFICATIONS
       *********************************************************************************************************************************************************** -->
-      <!--header start-->
-      <?php include 'header.php';?>
-      <!--header end-->
-      
-      <!-- **********************************************************************************************************************************************************
+        <!--header start-->
+        <?php include 'header.php';?>
+        <!--header end-->
+
+        <!-- **********************************************************************************************************************************************************
       MAIN SIDEBAR MENU
       *********************************************************************************************************************************************************** -->
-      <!--sidebar start-->
-      <?php
+        <!--sidebar start-->
+        <?php
       $active = 'category';
       include 'aside.php';?>
-      <!--sidebar end-->
-      
-      <!-- **********************************************************************************************************************************************************
+        <!--sidebar end-->
+
+        <!-- **********************************************************************************************************************************************************
       MAIN CONTENT
       *********************************************************************************************************************************************************** -->
-      <!--main content start-->
-      <section id="main-content">
-          <section class="wrapper">
-          	<h3><i class="fa fa-cogs"></i> 分类管理</h3>
-			
-          	<!-- SORTABLE TO DO LIST -->
-			
-              <div class="row mt mb">
-                  <div class="col-md-12">
-                      <section class="task-panel tasks-widget">
-	                	<div class="panel-heading">
-	                        <div class="pull-left"><h5><i class="fa fa-folder-open"></i> <?php if($child) echo '子'; ?>分类列表</h5></div>
-	                        <br>
-	                 	</div>
-                          <div class="panel-body">
-                              <div class="task-content">
-                                  <ul class="task-list">
+        <!--main content start-->
+        <section id="main-content">
+            <section class="wrapper">
+                <h3><i class="fa fa-cogs"></i> 分类管理</h3>
+
+                <!-- SORTABLE TO DO LIST -->
+
+                <div class="row mt mb">
+                    <div class="col-md-12">
+                        <section class="task-panel tasks-widget">
+                            <div class="panel-heading">
+                                <div class="pull-left">
+                                    <h5><i class="fa fa-folder-open"></i>
+                                        <?php if($child) echo '子'; ?>分类列表</h5>
+                                </div>
+                                <br>
+                            </div>
+                            <div class="panel-body">
+                                <div class="task-content">
+                                    <ul class="task-list">
+                                        <?php if($child):
+                                            $father = $lanthy->getCategory($child);
+                                        ?>
+                                        <li>
+                                            <div class="task-title">
+                                                <i class=" fa fa-share"> </i>
+                                                <span class="task-title-sp"><a href="?id=<?=$father['category_father_id']?>"> - 上级目录 -</a></span>
+                                            </div>
+                                        </li>
+                                        <?php endif; ?>
                                         <?php
                                         $categories = $lanthy->getCategories($child);
                                         foreach($categories as $category):
                                         ?>
-                                      <li class="list-primary">
-                                          <div class="task-title">
-                                              <i class=" fa fa-folder"> </i>
-                                              <span class="task-title-sp"> <a href="?id=<?=$category['rowid']?>">- <?=$category['categoryname']?> -</a></span>
-                                              <span class="badge bg-theme"><?=$category['dircounts']?></span>
-                                              <span class="badge bg-important"><?=$category['filecounts']?></span>
-                                              <div class="pull-right hidden-phone">
-                                                  <a href="?id=<?=$child?>&cateid=<?=$category['rowid']?>&action=del" class="btn btn-danger btn-xs fa fa-trash-o" title="删除分类"></a>
-                                              </div>
-                                          </div>
-                                      </li>
+                                        <li>
+                                            <div class="task-title">
+                                                <i class=" fa fa-folder"> </i>
+                                                <span class="task-title-sp"> <a href="?id=<?=$category['rowid']?>" title="<?=$category['category_desc']?>">-
+                                                        <?=$category['category_name']?> -</a></span>
+                                                <span class="badge bg-theme" title="目录数">
+                                                    <?=$category['category_child_counts']?></span>
+                                                <span class="badge bg-important" title="文件数">
+                                                    <?=$category['category_products_counts']?></span>
+                                                <div class="pull-right hidden-phone">
+                                                    <a href="?id=<?=$child?>&cateid=<?=$category['rowid']?>&action=del"
+                                                        class="btn btn-danger btn-xs fa fa-trash-o" title="删除分类"></a>
+                                                </div>
+                                            </div>
+                                        </li>
                                         <?php endforeach; ?>
-                                  </ul>
-                              </div>
-                              <div class=" add-task-row">
-                                <a class="btn btn-success btn-sm pull-left" href="addcategory.php?id=<?=$child?>">添加<?php if($child) echo '子'; ?>分类</a>
-                              </div>
-                          </div>
-                      </section>
-                  </div><!--/col-md-12 -->
-              </div><!-- /row -->
-			
-		</section><! --/wrapper -->
-      </section><!-- /MAIN CONTENT -->
+                                    </ul>
+                                </div>
+                                <div class=" add-task-row">
+                                    <a class="btn btn-success btn-sm pull-left" href="addcategory.php?id=<?=$child?>">添加
+                                        <?php if($child) echo '子'; ?>分类</a>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <!--/col-md-12 -->
+                </div><!-- /row -->
 
-      <!--main content end-->
-      <!--footer start-->
-      <footer class="site-footer">
-          <div class="text-center">
-              2018 &copy; Lanthy.com. 蓝悉科技强力驱动。
-              <a href="#" class="go-top">
-                  <i class="fa fa-angle-up"></i>
-              </a>
-          </div>
-      </footer>
-      <!--footer end-->
-  </section>
+            </section>
+            <! --/wrapper -->
+        </section><!-- /MAIN CONTENT -->
+
+        <!--main content end-->
+        <!--footer start-->
+        <footer class="site-footer">
+            <div class="text-center">
+                2018 &copy; Lanthy.com. 蓝悉科技强力驱动。
+                <a href="#" class="go-top">
+                    <i class="fa fa-angle-up"></i>
+                </a>
+            </div>
+        </footer>
+        <!--footer end-->
+    </section>
 
     <!-- js placed at the end of the document so the pages load faster -->
     <script src="assets/js/jquery.js"></script>
@@ -139,6 +166,7 @@ if(isset($_GET['cateid'])&&$_GET['cateid']>0){
 
     <!--common script for all pages-->
     <script src="assets/js/common-scripts.js"></script>
+    <?php include 'footer.php';?>
+</body>
 
-  </body>
 </html>

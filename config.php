@@ -45,21 +45,35 @@ class LANTHY{
      * getUser
      */
 	function getUsers(){
-        $sql="SELECT rowid,* FROM hlong_user WHERE auth < 9";
+        $sql="SELECT rowid,* FROM hlong_user WHERE user_auth < 9";
 		return $this->getData($sql);
+    }
+    /**
+     * getCategory
+     */
+    function getCategory($id){
+        $sql="SELECT rowid,* FROM hlong_category WHERE rowid = ".intval($id);
+		return $this->getLine($sql);
     }
     /**
      * getCategories
      */
     function getCategories($id=0){
-        $sql="SELECT rowid,* FROM hlong_category WHERE father = ".intval($id);
+        $sql="SELECT rowid,* FROM hlong_category WHERE category_father_id = ".intval($id);
 		return $this->getData($sql);
     }
     /**
-     * getInfo
+     * getProduct
+     */
+    function getProduct($id){
+        $sql="SELECT rowid,* FROM hlong_products WHERE rowid = ".intval($id);
+        return $this->getLine($sql);
+    }
+    /**
+     * getProducts
      */
     function getProducts($id=0){
-        $sql="SELECT rowid,* FROM hlong_products WHERE category = ".intval($id);
+        $sql="SELECT rowid,* FROM hlong_products WHERE product_category_id = ".intval($id);
 		return $this->getData($sql);
     }
 }
@@ -82,5 +96,5 @@ function format_date($time){
         }
     }
 }
-
+// 实例化
 $lanthy = New LANTHY("{$_SERVER['DOCUMENT_ROOT']}/DATA/{$dbname}");

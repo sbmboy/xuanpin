@@ -46,7 +46,7 @@ require_once 'config.php';
       <!--main content start-->
       <section id="main-content">
           <section class="wrapper site-min-height">
-          	<h3><i class="fa fa-angle-right"></i> 所有产品</h3>
+          	<h3><i class="fa fa-list-alt"></i> 所有产品</h3>
           	<div class="row mt">
           		<div class="col-lg-12">
 
@@ -501,6 +501,6 @@ require_once 'config.php';
       });
 
   </script>
-
+  <?php include 'footer.php';?>
   </body>
 </html>

@@ -5,9 +5,10 @@ require_once 'config.php';
  */
 if(isset($_POST['cate_name'])&&!empty($_POST['cate_name'])){
     $db = new SQLite3("DATA/{$dbname}",SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
-    $sql="INSERT INTO hlong_category (\"categoryname\",\"slug\",\"father\",\"dircounts\",\"filecounts\",\"remark\") VALUES ('".$db->escapeString($_POST['cate_name'])."','".$db->escapeString(md5($_POST['cate_name']))."','".$db->escapeString($_POST['father'])."',0,0,'".$db->escapeString($_POST['remark'])."')";
+    $sql="INSERT INTO hlong_category (\"category_name\", \"category_desc\",\"category_path\",\"category_father_id\", \"category_child_counts\",\"category_products_counts\") 
+    VALUES ('".$db->escapeString($_POST['cate_name'])."','".$db->escapeString($_POST['remark'])."','".$db->escapeString(md5($_POST['cate_name']))."','".$db->escapeString($_POST['father'])."',0,0)";
     $result = $db->exec($sql);
-    $sql="UPDATE hlong_category SET dircounts = dircounts+1 WHERE rowid =".intval($_POST['father']);
+    $sql="UPDATE hlong_category SET category_child_counts = category_child_counts+1 WHERE rowid =".intval($_POST['father']);
     $db->exec($sql);
     $db->close();
     if($result){
@@ -127,6 +128,6 @@ if(isset($_POST['cate_name'])&&!empty($_POST['cate_name'])){
     <!--common script for all pages-->
     <script src="assets/js/common-scripts.js"></script>
 
-
+<?php include 'footer.php';?>
   </body>
 </html>
